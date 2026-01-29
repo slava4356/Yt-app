@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>YT CENTER</title>
+    <!-- Подключение библиотеки Google -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        :root { --red: #ff0000; --bg: #000; --surface: #121212; --text: #fff; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        
+        /* Экран входа */
+        .auth-container { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; box-sizing: border-box; }
+        .app-name { font-size: 42px; font-weight: 900; color: var(--red); margin-bottom: 5px; letter-spacing: -1.5px; }
+        .welcome-msg { color: #888; font-size: 14px; margin-bottom: 30px; }
+        
+        .key-input { width: 100%; max-width: 320px; background: var(--surface); border: 1px solid #333; color: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; text-align: center; font-size: 16px; outline: none; }
+        .btn-start { width: 100%; max-width: 320px; background: var(--red); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; margin-bottom: 25px; }
+        
+        /* Основной экран */
+        #main-view { display: none; }
+        .search-nav { position: sticky; top: 0; background: rgba(0,0,0,0.95); padding: 10px; display: flex; gap: 10px; z-index: 100; border-bottom: 1px solid #222; }
+        .search-field { flex: 1; background: #222; border: none; border-radius: 20px; padding: 10px 15px; color: white; font-size: 14px; outline: none; }
+        
+        .video-item { margin-bottom: 25px; }
+        .video-item img { width: 100%; aspect-ratio: 16/9; object-fit: cover; cursor: pointer; }
+        .video-body { padding: 12px 15px; }
+        .video-title { font-size: 15px; font-weight: bold; margin-bottom: 8px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        
+        .btn-download { background: #fff; color: #000; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; margin-top: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <!-- ЭКРАН ЛОГИНА -->
+    <div id="auth-view" class="auth-container">
+        <div class="app-name">YT CENTER</div>
+        <div class="welcome-msg">Облачный доступ: slava4356</div>
+        
+        <input type="password" id="api-key-field" class="key-input" placeholder="Введите YouTube API Ключ">
+        <button class="btn-start" onclick="saveKeyAndStart()">ОТКРЫТЬ</button>
+        
+        <div style="margin-bottom: 20px; color: #333; font-size: 12px;">ИЛИ ВОЙДИТЕ ЧЕРЕЗ GOOGLE</div>
+        
+        <!-- Твой новый Client ID вставлен здесь -->
+        <div id="g_id_onload" 
+             data-client_id="275783825400-cp763gk82kdde9v0gf891pqt7hp2qfq9.apps.googleusercontent.com" 
+             data-callback="handleSignIn">
+        </div>
+        <div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="filled_black" data-width="320"></div>
+    </div>
+
+    <!-- ЭКРАН ПРИЛОЖЕНИЯ -->
+    <div id="main-view">
+        <div class="search-nav">
+            <input type="text" id="search-q" class="search-field" placeholder="Поиск видео..." onkeypress="if(event.key==='Enter') runSearch()">
+            <button onclick="exitApp()" style="background:none; border:none; color:#555; font-size:24px; cursor: pointer;">✕</button>
+        </div>
+        <div id="content-list"></div>
+    </div>
+
+    <script>
+        let myKey = localStorage.getItem('slava_saved_key') || '';
+
+        window.onload = () => {
+            if (myKey) startApp();
+        };
+
+        function handleSignIn(response) {
+            // При успешном входе через Google
+            localStorage.setItem('google_auth_active', 'true');
+            if (myKey) {
+                startApp();
+            } else {
+                alert("Вход выполнен! Теперь введите API Ключ в поле выше.");
+                document.getElementById('api-key-field').focus();
+            }
+        }
+
+        function saveKeyAndStart() {
+            const val = document.getElementById('api-key-field').value.trim();
+            if (val) {
+                myKey = val;
+                localStorage.setItem('slava_saved_key', val);
+                startApp();
+            } else {
+                alert("Сначала введите ключ!");
+            }
+        }
+
+        function startApp() {
+            document.getElementById('auth-view').style.display = 'none';
+            document.getElementById('main-view').style.display = 'block';
+            fetchData('https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&regionCode=RU&maxResults=10');
+        }
+
+        async function runSearch() {
+            const query = document.getElementById('search-q').value;
+            if (!query) return;
+            fetchData(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=10`);
+        }
+
+        async function fetchData(url) {
+            try {
+                const response = await fetch(`${url}&key=${myKey}`);
+                const data = await response.json();
+                if (data.error) throw new Error(data.error.message);
+                renderVideos(data.items);
+            } catch (err) {
+                alert("Ошибка ключа API: " + err.message);
+                exitApp();
+            }
+        }
+
+        function renderVideos(items) {
+            const list = document.getElementById('content-list');
+            list.innerHTML = '';
+            items.forEach(item => {
+                const id = item.id.videoId || item.id;
+                const s = item.snippet;
+                list.innerHTML += `
+                    <div class="video-item">
+                        <img src="${s.thumbnails.high.url}" onclick="window.open('https://youtube.com/watch?v=${id}')">
+                        <div class="video-body">
+                            <div class="video-title">${s.title}</div>
+                            <div style="color:#666; font-size:12px;">${s.channelTitle}</div>
+                            <button class="btn-download" onclick="window.open('https://cobalt.tools')">СКАЧАТЬ ВИДЕО</button>
+                        </div>
+                    </div>`;
+            });
+            window.scrollTo(0, 0);
+        }
+
+        function exitApp() {
+            localStorage.clear();
+            location.reload();
+        }
+    </script>
+</body>
+</html>
+
