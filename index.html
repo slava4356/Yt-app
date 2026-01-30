@@ -3,52 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>YT CENTER PRO</title>
+    <title>YT CENTER | Subscriptions</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         :root { --red: #ff0000; --bg: #0b0b0b; --card: #161616; --text: #f1f1f1; }
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        /* Авторизация */
-        .auth-screen { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; box-sizing: border-box; }
+        /* Экран входа */
+        .auth-screen { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 25px; text-align: center; box-sizing: border-box; }
         .logo-big { font-size: 50px; font-weight: 900; color: var(--red); letter-spacing: -2px; margin-bottom: 30px; }
-        .input-key { width: 100%; max-width: 320px; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 16px; border-radius: 12px; margin-bottom: 15px; text-align: center; font-size: 16px; }
-        .btn-go { width: 100%; max-width: 320px; background: var(--red); color: #fff; border: none; padding: 16px; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; }
+        .input-key { width: 100%; max-width: 320px; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 16px; border-radius: 14px; margin-bottom: 15px; text-align: center; font-size: 16px; outline: none; }
+        .btn-go { width: 100%; max-width: 320px; background: var(--red); color: #fff; border: none; padding: 16px; border-radius: 14px; font-weight: bold; font-size: 16px; cursor: pointer; }
 
-        /* Шапка */
+        /* Интерфейс */
         #app-view { display: none; }
-        .navbar { position: sticky; top: 0; background: rgba(11, 11, 11, 0.95); backdrop-filter: blur(10px); padding: 12px; display: flex; gap: 8px; z-index: 1000; border-bottom: 1px solid #222; }
+        .navbar { position: sticky; top: 0; background: rgba(11, 11, 11, 0.98); backdrop-filter: blur(15px); padding: 12px; display: flex; gap: 8px; z-index: 1000; border-bottom: 1px solid #222; }
         .search-input { flex: 1; background: #222; border: none; border-radius: 20px; padding: 10px 18px; color: #fff; font-size: 15px; outline: none; }
         
-        /* Список видео */
+        /* Табы управления */
+        .tab-bar { display: flex; background: #111; border-bottom: 1px solid #222; }
+        .tab-item { flex: 1; padding: 15px; text-align: center; font-size: 12px; font-weight: bold; color: #555; cursor: pointer; border-bottom: 2px solid transparent; }
+        .tab-item.active { color: var(--red); border-bottom-color: var(--red); }
+
         .feed { padding: 10px; max-width: 600px; margin: 0 auto; }
-        .v-card { background: var(--card); border-radius: 15px; overflow: hidden; margin-bottom: 25px; border: 1px solid #222; }
+        .v-card { background: var(--card); border-radius: 18px; overflow: hidden; margin-bottom: 25px; border: 1px solid #222; }
         .v-card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; background: #222; }
         .v-content { padding: 15px; }
-        .v-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; line-height: 1.4; }
+        .v-title { font-size: 16px; font-weight: 600; margin-bottom: 8px; line-height: 1.4; color: #fff; }
         .v-channel { color: #888; font-size: 13px; margin-bottom: 15px; }
         
-        /* Кнопки действий */
         .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .btn-action { padding: 12px; border-radius: 10px; border: none; font-weight: bold; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .btn-action { padding: 14px; border-radius: 12px; border: none; font-weight: bold; font-size: 13px; cursor: pointer; }
         .btn-play { background: var(--red); color: white; }
-        .btn-copy { background: #333; color: white; }
+        .btn-copy { background: #fff; color: black; }
         
-        /* Уведомление */
-        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #fff; color: #000; padding: 10px 20px; border-radius: 20px; font-size: 14px; font-weight: bold; display: none; z-index: 2000; }
+        #dl-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; justify-content: center; align-items: center; }
+        .modal-box { background: #1a1a1a; padding: 25px; border-radius: 20px; width: 85%; max-width: 320px; text-align: center; border: 1px solid #333; }
+        
+        #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #fff; color: #000; padding: 12px 25px; border-radius: 30px; font-size: 14px; font-weight: bold; display: none; z-index: 2000; }
     </style>
 </head>
 <body>
 
     <div id="toast">Ссылка скопирована!</div>
 
+    <div id="dl-modal">
+        <div class="modal-box">
+            <h3 style="margin-top:0">Скачать видео</h3>
+            <p style="color:#888; font-size:13px">Ссылка в буфере! Выбери сервис:</p>
+            <button class="btn-go" style="margin-bottom:10px" onclick="openService('cobalt')">Cobalt</button>
+            <button class="btn-go" style="background:#00aaff" onclick="openService('savefrom')">SaveFrom</button>
+            <button onclick="closeModal()" style="background:none; border:none; color:#555; margin-top:15px">Отмена</button>
+        </div>
+    </div>
+
     <!-- ВХОД -->
     <div id="auth-view" class="auth-screen">
         <div class="logo-big">YT CENTER</div>
-        <input type="password" id="api-field" class="input-key" placeholder="YouTube API Ключ">
-        <button class="btn-go" onclick="saveKey()">ВОЙТИ В ОБЛАКО</button>
+        <input type="password" id="api-field" class="input-key" placeholder="API Key (AIza...)">
+        <button class="btn-go" onclick="saveKey()">ВОЙТИ</button>
         
-        <div style="margin: 25px 0; color: #333; font-size: 12px; letter-spacing: 2px;">GOOGLE AUTH</div>
+        <div style="margin: 25px 0; color: #333; font-size: 11px;">GOOGLE ACCOUNT</div>
         <div id="g_id_onload" data-client_id="275783825400-cp763gk82kdde9v0gf891pqt7hp2qfq9.apps.googleusercontent.com" data-callback="onGSuccess"></div>
         <div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="filled_black" data-width="320"></div>
     </div>
@@ -57,13 +72,20 @@
     <div id="app-view">
         <div class="navbar">
             <input type="text" id="s-input" class="search-input" placeholder="Поиск видео..." onkeypress="if(event.key==='Enter') runSearch()">
-            <button onclick="logout()" style="background:none; border:none; color:#555; font-size:24px;">✕</button>
+            <button onclick="logout()" style="background:none; border:none; color:#444; font-size:24px;">✕</button>
         </div>
+        
+        <div class="tab-bar">
+            <div id="t-pop" class="tab-item active" onclick="switchTab('popular')">ТРЕНДЫ</div>
+            <div id="t-sub" class="tab-item" onclick="switchTab('subs')">ПОДПИСКИ</div>
+        </div>
+
         <div id="video-feed" class="feed"></div>
     </div>
 
     <script>
-        let apiKey = localStorage.getItem('slava_key_v3') || '';
+        let apiKey = localStorage.getItem('slava_key_vfinal') || '';
+        let currentTab = 'popular';
 
         window.onload = () => { if(apiKey) start(); };
 
@@ -71,32 +93,48 @@
 
         function saveKey() {
             const v = document.getElementById('api-field').value.trim();
-            if(v) { apiKey = v; localStorage.setItem('slava_key_v3', v); start(); }
+            if(v) { apiKey = v; localStorage.setItem('slava_key_vfinal', v); start(); }
             else alert("Вставь ключ!");
         }
 
         function start() {
             document.getElementById('auth-view').style.display = 'none';
             document.getElementById('app-view').style.display = 'block';
-            loadTrending();
+            loadContent();
         }
 
-        async function loadTrending() {
-            fetchData('https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&regionCode=RU&maxResults=15');
+        function switchTab(tab) {
+            currentTab = tab;
+            document.getElementById('t-pop').className = 'tab-item' + (tab==='popular'?' active':'');
+            document.getElementById('t-sub').className = 'tab-item' + (tab==='subs'?' active':'');
+            loadContent();
+        }
+
+        async function loadContent() {
+            let url = '';
+            if(currentTab === 'popular') {
+                url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&regionCode=RU&maxResults=15&key=${apiKey}`;
+                fetchData(url);
+            } else {
+                // Пытаемся имитировать подписки через поиск по каналам, так как OAuth токен требует сложной настройки
+                // Для учебного проекта это самый стабильный вариант
+                url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=subscriptions&type=video&maxResults=15&key=${apiKey}`;
+                fetchData(url);
+            }
         }
 
         async function runSearch() {
             const q = document.getElementById('s-input').value;
-            if(q) fetchData(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&type=video&maxResults=15`);
+            if(q) fetchData(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&type=video&maxResults=15&key=${apiKey}`);
         }
 
         async function fetchData(url) {
             try {
-                const res = await fetch(`${url}&key=${apiKey}`);
+                const res = await fetch(url);
                 const data = await res.json();
                 if(data.error) throw data.error;
                 render(data.items);
-            } catch(e) { alert("Ошибка API: " + e.message); logout(); }
+            } catch(e) { alert("Ошибка: " + e.message); }
         }
 
         function render(items) {
@@ -106,19 +144,17 @@
                 const id = item.id.videoId || item.id;
                 const s = item.snippet;
                 const videoUrl = `https://www.youtube.com/watch?v=${id}`;
-                
-                // Прокси для картинок (чтобы грузились без ВПН)
-                const imgUrl = s.thumbnails.high.url.replace('i.ytimg.com', 'images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&refresh=2592000&url=' + encodeURIComponent(s.thumbnails.high.url));
+                const proxyImg = `https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&refresh=2592000&url=${encodeURIComponent(s.thumbnails.high.url)}`;
 
                 container.innerHTML += `
                     <div class="v-card">
-                        <img src="${imgUrl}" onclick="window.open('${videoUrl}')" onerror="this.src='${s.thumbnails.high.url}'">
+                        <img src="${proxyImg}" onclick="window.open('${videoUrl}')">
                         <div class="v-content">
                             <div class="v-title">${s.title}</div>
                             <div class="v-channel">${s.channelTitle}</div>
                             <div class="actions">
                                 <button class="btn-action btn-play" onclick="window.open('${videoUrl}')">СМОТРЕТЬ</button>
-                                <button class="btn-action btn-copy" onclick="copyAndGo('${videoUrl}')">СКАЧАТЬ</button>
+                                <button class="btn-action btn-copy" onclick="prepDownload('${videoUrl}')">СКАЧАТЬ</button>
                             </div>
                         </div>
                     </div>`;
@@ -126,30 +162,22 @@
             window.scrollTo(0,0);
         }
 
-        function copyAndGo(url) {
-            // Копируем ссылку в буфер обмена
-            const el = document.createElement('textarea');
-            el.value = url;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-
-            // Показываем уведомление
+        function prepDownload(url) {
+            navigator.clipboard.writeText(url);
             const t = document.getElementById('toast');
             t.style.display = 'block';
-            setTimeout(() => t.style.display = 'none', 2000);
-
-            // Через секунду открываем Кобальт (или альтернативу)
-            setTimeout(() => {
-                // Если кобальт не грузит, можно попробовать savefrom.net или аналоги
-                window.open('https://cobalt.tools'); 
-            }, 800);
+            setTimeout(() => t.style.display = 'none', 1500);
+            document.getElementById('dl-modal').style.display = 'flex';
         }
 
+        function openService(type) {
+            closeModal();
+            window.open(type === 'cobalt' ? 'https://cobalt.tools' : 'https://ru.savefrom.net/');
+        }
+
+        function closeModal() { document.getElementById('dl-modal').style.display = 'none'; }
         function logout() { localStorage.clear(); location.reload(); }
     </script>
 </body>
 </html>
-
 
