@@ -3,188 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>YT CENTER STABLE</title>
+    <title>YT CENTER | Fixed Images</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
-        :root { --red: #ff0000; --bg: #050505; --card: #111; --text: #fff; }
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: sans-serif; -webkit-font-smoothing: antialiased; }
+        :root { --red: #ff0000; --bg: #000; --card: #111; --text: #fff; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; }
         
         /* Вход */
-        .login-view { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; }
-        .logo-main { font-size: 45px; font-weight: 900; color: var(--red); margin-bottom: 30px; letter-spacing: -2px; }
-        .key-box { width: 100%; max-width: 320px; padding: 16px; border-radius: 12px; border: 1px solid #333; background: #1a1a1a; color: #fff; margin-bottom: 12px; font-size: 16px; outline: none; box-sizing: border-box; }
+        .login-page { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; }
+        .logo { font-size: 40px; font-weight: 900; color: var(--red); margin-bottom: 20px; }
+        .input-style { width: 100%; max-width: 300px; padding: 15px; border-radius: 10px; border: 1px solid #333; background: #222; color: #fff; margin-bottom: 10px; text-align: center; }
         
-        /* Основной экран */
-        #main-view { display: none; }
-        .top-nav { position: sticky; top: 0; background: #000; padding: 12px; display: flex; gap: 8px; z-index: 100; border-bottom: 1px solid #222; }
-        .search-bar { flex: 1; padding: 12px 18px; border-radius: 20px; border: none; background: #1a1a1a; color: #fff; font-size: 15px; }
+        /* Приложение */
+        #app { display: none; }
+        .header { position: sticky; top: 0; background: #000; padding: 10px; display: flex; gap: 8px; z-index: 100; border-bottom: 1px solid #222; }
+        .search-field { flex: 1; padding: 12px; border-radius: 8px; border: none; background: #222; color: #fff; outline: none; }
         
         .tabs { display: flex; background: #000; border-bottom: 1px solid #222; }
-        .tab-btn { flex: 1; padding: 16px; text-align: center; font-size: 12px; color: #666; font-weight: bold; cursor: pointer; border-bottom: 2px solid transparent; }
-        .tab-btn.active { color: var(--red); border-bottom-color: var(--red); }
+        .tab { flex: 1; padding: 15px; text-align: center; font-size: 13px; font-weight: bold; color: #555; }
+        .tab.active { color: var(--red); border-bottom: 2px solid var(--red); }
 
-        .video-feed { padding: 12px; max-width: 600px; margin: 0 auto; }
-        .video-card { background: var(--card); border-radius: 15px; overflow: hidden; margin-bottom: 24px; border: 1px solid #222; }
-        .video-card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; background: #1a1a1a; }
-        .video-meta { padding: 15px; }
-        .video-name { font-size: 16px; font-weight: bold; margin-bottom: 6px; line-height: 1.3; }
+        .feed { padding: 10px; }
+        .card { background: var(--card); border-radius: 12px; overflow: hidden; margin-bottom: 20px; border: 1px solid #222; }
+        .card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; background: #111; }
+        .details { padding: 12px; }
+        .title { font-size: 15px; font-weight: bold; margin-bottom: 8px; line-height: 1.3; }
         
         /* Кнопки */
-        .dl-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 15px; }
-        .btn-ui { padding: 12px 5px; border: none; border-radius: 8px; font-weight: bold; font-size: 10px; cursor: pointer; text-align: center; text-transform: uppercase; }
-        .btn-play { background: var(--red); color: #fff; }
-        .btn-cobalt { background: #fff; color: #000; }
-        .btn-save { background: #0088ff; color: #fff; }
+        .btn-group { display: flex; gap: 5px; margin-top: 10px; }
+        .action-btn { flex: 1; padding: 12px 5px; border: none; border-radius: 6px; font-weight: bold; font-size: 11px; cursor: pointer; text-transform: uppercase; }
+        .btn-watch { background: var(--red); color: #fff; }
+        .btn-dl1 { background: #fff; color: #000; }
+        .btn-dl2 { background: #0088ff; color: #fff; }
 
-        #alert { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #fff; color: #000; padding: 10px 20px; border-radius: 30px; font-size: 13px; font-weight: bold; display: none; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #fff; color: #000; padding: 10px 20px; border-radius: 20px; font-weight: bold; display: none; z-index: 1000; }
     </style>
 </head>
 <body>
 
-<div id="alert">Ссылка скопирована</div>
+<div id="toast">Ссылка скопирована!</div>
 
-<!-- ЭКРАН ЛОГИНА -->
-<div id="login-screen" class="login-view">
-    <div class="logo-main">YT CENTER</div>
-    <input type="password" id="yt-key" class="key-box" placeholder="YouTube API Key">
-    <button onclick="saveAndStart()" class="btn-ui btn-play" style="width: 100%; max-width: 320px; font-size: 16px; padding: 16px;">ОТКРЫТЬ</button>
-    
-    <div style="margin: 25px 0; color: #333; font-size: 12px; letter-spacing: 2px;">GOOGLE AUTH</div>
-    <div id="g_id_onload" data-client_id="275783825400-cp763gk82kdde9v0gf891pqt7hp2qfq9.apps.googleusercontent.com" data-callback="onGoogleAuth"></div>
-    <div class="g_id_signin" data-type="standard" data-shape="pill"></div>
+<div id="login" class="login-page">
+    <div class="logo">YT CENTER</div>
+    <input type="password" id="api_key_input" class="input-style" placeholder="YouTube API Key">
+    <button onclick="saveAuth()" class="action-btn btn-watch" style="width: 100%; max-width: 300px; padding: 15px; font-size: 14px;">ВОЙТИ</button>
+    <div style="margin: 20px 0; color: #444;">ИЛИ</div>
+    <div id="g_id_onload" data-client_id="275783825400-cp763gk82kdde9v0gf891pqt7hp2qfq9.apps.googleusercontent.com" data-callback="handleGLogin"></div>
+    <div class="g_id_signin" data-type="standard"></div>
 </div>
 
-<!-- ПРИЛОЖЕНИЕ -->
-<div id="main-view">
-    <div class="top-nav">
-        <input type="text" id="search-q" class="search-bar" placeholder="Поиск видео..." onkeypress="if(event.key==='Enter') startSearch()">
-        <button onclick="resetAll()" style="background:none; border:none; color:#555; font-size:24px;">✕</button>
+<div id="app">
+    <div class="header">
+        <input type="text" id="query" class="search-field" placeholder="Поиск..." onkeypress="if(event.key==='Enter') search()">
+        <button onclick="exitApp()" style="background:none; border:none; color:#555; font-size:24px;">✕</button>
     </div>
     <div class="tabs">
-        <div id="t-popular" class="tab-btn active" onclick="changeTab('popular')">ПОПУЛЯРНОЕ</div>
-        <div id="t-subs" class="tab-btn" onclick="changeTab('subs')">ПОДПИСКИ</div>
+        <div id="tab1" class="tab active" onclick="setMode('popular')">ТРЕНДЫ</div>
+        <div id="tab2" class="tab" onclick="setMode('subs')">ПОДПИСКИ</div>
     </div>
-    <div id="feed" class="video-feed"></div>
+    <div id="content_list" class="feed"></div>
 </div>
 
 <script>
-    let currentApiKey = localStorage.getItem('slava_yt_key_v4') || '';
-    let activeMode = 'popular';
+    let savedKey = localStorage.getItem('yt_key_final_v5') || '';
+    let mode = 'popular';
 
-    if(currentApiKey) launch();
+    if(savedKey) launchApp();
 
-    function onGoogleAuth() { 
-        if(!currentApiKey) {
-            document.getElementById('yt-key').focus();
-            notify("Вход выполнен. Теперь введите API ключ.");
-        } else {
-            launch();
-        }
+    function handleGLogin() { if(!savedKey) document.getElementById('api_key_input').focus(); else launchApp(); }
+
+    function saveAuth() {
+        let k = document.getElementById('api_key_input').value.trim();
+        if(k) { savedKey = k; localStorage.setItem('yt_key_final_v5', k); launchApp(); }
+        else alert("Введите API Ключ!");
     }
 
-    function saveAndStart() {
-        const val = document.getElementById('yt-key').value.trim();
-        if(val) { 
-            currentApiKey = val; 
-            localStorage.setItem('slava_yt_key_v4', val); 
-            launch(); 
-        } else {
-            alert("Нужен API ключ!");
-        }
+    function launchApp() {
+        document.getElementById('login').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        load();
     }
 
-    function launch() {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('main-view').style.display = 'block';
-        loadData();
+    function setMode(m) {
+        mode = m;
+        document.getElementById('tab1').className = m === 'popular' ? 'tab active' : 'tab';
+        document.getElementById('tab2').className = m === 'subs' ? 'tab active' : 'tab';
+        load();
     }
 
-    function changeTab(mode) {
-        activeMode = mode;
-        document.getElementById('t-popular').classList.toggle('active', mode === 'popular');
-        document.getElementById('t-subs').classList.toggle('active', mode === 'subs');
-        loadData();
+    async function load() {
+        let url = mode === 'popular' 
+            ? `https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&regionCode=RU&maxResults=15&key=${savedKey}`
+            : `https://www.googleapis.com/youtube/v3/search?part=snippet&q=интересное&type=video&maxResults=15&key=${savedKey}`;
+        getData(url);
     }
 
-    async function loadData() {
-        let url = activeMode === 'popular' 
-            ? `https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&regionCode=RU&maxResults=15&key=${currentApiKey}`
-            : `https://www.googleapis.com/youtube/v3/search?part=snippet&q=рекомендации&type=video&maxResults=15&key=${currentApiKey}`;
-        fetchYT(url);
+    async function search() {
+        let q = document.getElementById('query').value;
+        if(q) getData(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&type=video&maxResults=15&key=${savedKey}`);
     }
 
-    async function startSearch() {
-        const q = document.getElementById('search-q').value;
-        if(q) fetchYT(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&type=video&maxResults=15&key=${currentApiKey}`);
-    }
-
-    async function fetchYT(url) {
+    async function getData(url) {
         try {
-            const res = await fetch(url);
-            const data = await res.json();
-            if(data.error) throw data.error;
-            renderItems(data.items);
-        } catch(e) { 
-            console.error(e);
-            if(e.message.includes('key')) alert("Проблема с API ключом!");
-        }
+            let r = await fetch(url);
+            let d = await r.json();
+            if(d.error) throw d.error;
+            render(d.items);
+        } catch(e) { alert("Ошибка: " + e.message); }
     }
 
-    function renderItems(items) {
-        let html = '';
-        items.forEach(item => {
-            const id = item.id.videoId || item.id;
-            const s = item.snippet;
-            const vUrl = `https://www.youtube.com/watch?v=${id}`;
+    function render(items) {
+        let h = '';
+        items.forEach(i => {
+            let id = i.id.videoId || i.id;
+            let s = i.snippet;
+            let url = `https://www.youtube.com/watch?v=${id}`;
             
-            // Трюк с картинками: используем разные домены Google, чтобы пробить блок
-            // Пробуем сначала запасной домен i9.ytimg.com (часто работает лучше)
-            let img = s.thumbnails.high.url.replace('i.ytimg.com', 'i9.ytimg.com');
+            // СИЛЬНЫЙ ПРОКСИ (через Cloudflare/Weserv), который меняет адрес до неузнаваемости
+            let thumb = s.thumbnails.high.url;
+            let secureThumb = `https://images.weserv.nl/?url=${encodeURIComponent(thumb.replace('https://', ''))}&w=400&output=jpg`;
 
-            html += `
-                <div class="video-card">
-                    <img src="${img}" onclick="window.open('${vUrl}')" onerror="this.src='${s.thumbnails.high.url}'">
-                    <div class="video-meta">
-                        <div class="video-name">${s.title}</div>
+            h += `
+                <div class="card">
+                    <img src="${secureThumb}" onclick="window.open('${url}')" onerror="this.src='https://via.placeholder.com/400x225?text=Video+Preview'">
+                    <div class="details">
+                        <div class="title">${s.title}</div>
                         <div style="color:#666; font-size:12px;">${s.channelTitle}</div>
-                        <div class="dl-btns">
-                            <button class="btn-ui btn-play" onclick="window.open('${vUrl}')">Смотреть</button>
-                            <button class="btn-ui btn-cobalt" onclick="copyAndOpen('${vUrl}', 'cobalt')">Cobalt</button>
-                            <button class="btn-ui btn-save" onclick="copyAndOpen('${vUrl}', 'save')">SaveFrom</button>
+                        <div class="btn-group">
+                            <button class="action-btn btn-watch" onclick="window.open('${url}')">Смотреть</button>
+                            <button class="action-btn btn-dl1" onclick="copyAndGo('${url}', 'c')">Cobalt</button>
+                            <button class="action-btn btn-dl2" onclick="copyAndGo('${url}', 's')">SaveFrom</button>
                         </div>
                     </div>
                 </div>`;
         });
-        document.getElementById('feed').innerHTML = html;
+        document.getElementById('content_list').innerHTML = h;
         window.scrollTo(0,0);
     }
 
-    function copyAndOpen(url, service) {
-        // Копирование ссылки
-        const temp = document.createElement("textarea");
-        temp.value = url;
-        document.body.appendChild(temp);
-        temp.select();
-        document.execCommand("copy");
-        document.body.removeChild(temp);
+    function copyAndGo(link, srv) {
+        // Копирование
+        const el = document.createElement('textarea');
+        el.value = link;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
 
-        notify("Ссылка скопирована!");
+        // Уведомление
+        let t = document.getElementById('toast');
+        t.style.display = 'block';
+        setTimeout(() => t.style.display = 'none', 1500);
 
-        // Открытие сервиса
+        // Переход
         setTimeout(() => {
-            if(service === 'cobalt') window.open('https://cobalt.tools');
-            else window.open('https://ru.savefrom.net/');
-        }, 600);
+            window.open(srv === 'c' ? 'https://cobalt.tools' : 'https://ru.savefrom.net/');
+        }, 500);
     }
 
-    function notify(text) {
-        const a = document.getElementById('alert');
-        a.innerText = text;
-        a.style.display = 'block';
-        setTimeout(() => a.style.display = 'none', 2000);
-    }
-
-    function resetAll() { localStorage.clear(); location.reload(); }
+    function exitApp() { localStorage.clear(); location.reload(); }
 </script>
 
 </body>
