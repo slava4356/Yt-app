@@ -3,154 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>YT CENTER | TOTAL FIX</title>
+    <title>YT CENTER | SURVIVOR</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
-        :root { --red: #ff0000; --bg: #000; --card: #151515; --text: #fff; }
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+        :root { --red: #ff0000; --bg: #000; --card: #111; --text: #fff; --gray: #888; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, system-ui, sans-serif; }
         
         /* Авторизация */
-        .auth-screen { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; box-sizing: border-box; }
-        .logo-main { font-size: 42px; font-weight: 900; color: var(--red); margin-bottom: 30px; letter-spacing: -2px; }
-        .input-key { width: 100%; max-width: 320px; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 16px; border-radius: 12px; margin-bottom: 15px; text-align: center; font-size: 16px; outline: none; }
+        .auth-container { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
+        .logo-text { font-size: 40px; font-weight: 900; color: var(--red); margin-bottom: 30px; }
+        .key-input { width: 100%; max-width: 320px; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 16px; border-radius: 12px; margin-bottom: 15px; text-align: center; font-size: 16px; outline: none; }
         
-        /* Главный экран */
+        /* Приложение */
         #app { display: none; }
-        .navbar { position: sticky; top: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(15px); padding: 12px; display: flex; gap: 10px; z-index: 1000; border-bottom: 1px solid #222; }
-        .search-field { flex: 1; background: #222; border: none; border-radius: 12px; padding: 12px 15px; color: #fff; font-size: 16px; }
-        .btn-search { background: var(--red); color: #fff; border: none; padding: 0 20px; border-radius: 12px; font-weight: bold; cursor: pointer; }
+        .nav-bar { position: sticky; top: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); padding: 12px; display: flex; gap: 8px; z-index: 100; border-bottom: 1px solid #222; }
+        .search-input { flex: 1; background: #222; border: none; border-radius: 10px; padding: 12px; color: #fff; font-size: 16px; outline: none; }
+        .ok-btn { background: var(--red); color: #fff; border: none; border-radius: 10px; padding: 0 15px; font-weight: bold; cursor: pointer; }
         
-        .tabs { display: flex; background: #000; border-bottom: 1px solid #222; position: sticky; top: 65px; z-index: 999; }
-        .tab { flex: 1; padding: 15px; text-align: center; font-size: 13px; font-weight: bold; color: #666; cursor: pointer; }
+        .tabs { display: flex; border-bottom: 1px solid #222; background: #000; }
+        .tab { flex: 1; padding: 16px; text-align: center; font-size: 13px; font-weight: bold; color: #444; cursor: pointer; }
         .tab.active { color: var(--red); border-bottom: 3px solid var(--red); }
 
-        .content { padding: 15px; max-width: 600px; margin: 0 auto; }
-        .video-card { background: var(--card); border-radius: 20px; overflow: hidden; margin-bottom: 30px; border: 1px solid #222; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-        .video-card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; background: #111; cursor: pointer; }
-        .video-meta { padding: 18px; }
-        .video-title { font-size: 16px; font-weight: 700; margin-bottom: 15px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .feed-box { padding: 12px; max-width: 600px; margin: 0 auto; }
+        .video-item { background: var(--card); border-radius: 16px; overflow: hidden; margin-bottom: 25px; border: 1px solid #222; }
+        .video-item img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; background: #111; }
+        .video-info { padding: 16px; }
+        .video-title { font-size: 16px; font-weight: bold; margin-bottom: 15px; line-height: 1.4; }
         
-        /* Кнопки загрузки */
-        .download-options { display: flex; flex-direction: column; gap: 10px; }
-        .btn { padding: 15px; border-radius: 12px; border: none; font-weight: 800; font-size: 14px; cursor: pointer; text-align: center; text-decoration: none; display: block; transition: 0.2s; }
-        .btn-watch { background: var(--red); color: #fff; }
-        .btn-dl-1 { background: #fff; color: #000; }
-        .btn-dl-2 { background: #333; color: #fff; }
-        .btn:active { transform: scale(0.97); }
+        /* Кнопки действий */
+        .btn-stack { display: flex; flex-direction: column; gap: 8px; }
+        .btn-action { padding: 14px; border-radius: 10px; border: none; font-weight: 800; font-size: 14px; cursor: pointer; text-align: center; text-decoration: none; transition: 0.2s; }
+        .btn-red { background: var(--red); color: #fff; }
+        .btn-white { background: #fff; color: #000; }
+        .btn-dark { background: #333; color: #fff; }
+        .btn-action:active { transform: scale(0.97); }
 
-        #notify { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #fff; color: #000; padding: 12px 25px; border-radius: 50px; font-weight: bold; display: none; z-index: 2000; box-shadow: 0 5px 25px rgba(0,0,0,0.5); }
+        #toast-msg { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #fff; color: #000; padding: 12px 25px; border-radius: 50px; font-weight: bold; display: none; z-index: 1000; box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
 
-<div id="notify"></div>
+<div id="toast-msg">Ссылка скопирована!</div>
 
-<div id="login-screen" class="auth-screen">
-    <div class="logo-main">YT CENTER</div>
-    <input type="password" id="api-key-input" class="input-key" placeholder="YouTube API Key">
-    <button onclick="handleLogin()" class="btn btn-watch" style="width: 100%; max-width: 320px;">ВОЙТИ В ПРИЛОЖЕНИЕ</button>
-    <div style="margin: 20px 0; font-size: 11px; color: #444; letter-spacing: 1px;">OR GOOGLE LOGIN</div>
-    <div id="g_id_onload" data-client_id="275783825400-cp763gk82kdde9v0gf891pqt7hp2qfq9.apps.googleusercontent.com" data-callback="onGoogleAuth"></div>
+<div id="login-view" class="auth-container">
+    <div class="logo-text">YT CENTER</div>
+    <input type="password" id="api-field" class="key-input" placeholder="YouTube API Key">
+    <button onclick="saveAndJoin()" class="btn-action btn-red" style="width: 100%; max-width: 320px;">ВОЙТИ</button>
+    <div style="margin: 25px 0; color: #333; font-size: 11px;">GOOGLE AUTH</div>
+    <div id="g_id_onload" data-client_id="275783825400-cp763gk82kdde9v0gf891pqt7hp2qfq9.apps.googleusercontent.com" data-callback="gSignIn"></div>
     <div class="g_id_signin" data-type="standard"></div>
 </div>
 
 <div id="app">
-    <div class="navbar">
-        <input type="text" id="search-input" class="search-field" placeholder="Поиск видео..." onkeypress="if(event.key==='Enter') startSearch()">
-        <button class="btn-search" onclick="startSearch()">OK</button>
+    <div class="nav-bar">
+        <input type="text" id="search-box" class="search-input" placeholder="Поиск видео..." onkeypress="if(event.key==='Enter') startSearch()">
+        <button class="ok-btn" onclick="startSearch()">OK</button>
     </div>
     <div class="tabs">
-        <div id="tab-pop" class="tab active" onclick="setMode('pop')">ТРЕНДЫ</div>
-        <div id="tab-rec" class="tab" onclick="setMode('rec')">ДЛЯ ВАС</div>
+        <div id="tab-p" class="tab active" onclick="switchMode('p')">ТРЕНДЫ</div>
+        <div id="tab-s" class="tab" onclick="switchMode('s')">РЕКОМЕНДАЦИИ</div>
     </div>
-    <div id="main-feed" class="content"></div>
+    <div id="content-list" class="feed-box"></div>
 </div>
 
 <script>
-    let userKey = localStorage.getItem('slava_final_stable_v14') || '';
-    let currentMode = 'pop';
+    let currentKey = localStorage.getItem('slava_survivor_v15') || '';
+    let mode = 'p';
 
-    if(userKey) showApp();
+    if(currentKey) openApp();
 
-    function onGoogleAuth() { if(!userKey) document.getElementById('api-key-input').focus(); else showApp(); }
+    function gSignIn() { if(!currentKey) document.getElementById('api-field').focus(); else openApp(); }
 
-    function handleLogin() {
-        const val = document.getElementById('api-key-input').value.trim();
-        if(val) { userKey = val; localStorage.setItem('slava_final_stable_v14', val); showApp(); }
+    function saveAndJoin() {
+        const v = document.getElementById('api-field').value.trim();
+        if(v) { currentKey = v; localStorage.setItem('slava_survivor_v15', v); openApp(); }
         else alert("Введите ключ!");
     }
 
-    function showApp() {
-        document.getElementById('login-screen').style.display = 'none';
+    function openApp() {
+        document.getElementById('login-view').style.display = 'none';
         document.getElementById('app').style.display = 'block';
-        loadItems();
+        fetchFeed();
     }
 
-    function setMode(m) {
-        currentMode = m;
-        document.getElementById('tab-pop').classList.toggle('active', m === 'pop');
-        document.getElementById('tab-rec').classList.toggle('active', m === 'rec');
-        loadItems();
+    function switchMode(m) {
+        mode = m;
+        document.getElementById('tab-p').classList.toggle('active', m === 'p');
+        document.getElementById('tab-s').classList.toggle('active', m === 's');
+        fetchFeed();
     }
 
     async function startSearch() {
-        const query = document.getElementById('search-input').value;
-        if(query) {
-            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&maxResults=15&key=${userKey}`;
-            requestYT(url);
+        const q = document.getElementById('search-box').value;
+        if(q) {
+            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&type=video&maxResults=15&key=${currentKey}`;
+            apiCall(url);
         }
     }
 
-    async function loadItems() {
-        let url = currentMode === 'pop' 
-            ? `https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&regionCode=RU&maxResults=15&key=${userKey}`
-            : `https://www.googleapis.com/youtube/v3/search?part=snippet&q=рекомендации&type=video&maxResults=15&key=${userKey}`;
-        requestYT(url);
+    async function fetchFeed() {
+        let url = mode === 'p' 
+            ? `https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&regionCode=RU&maxResults=15&key=${currentKey}`
+            : `https://www.googleapis.com/youtube/v3/search?part=snippet&q=интересное&type=video&maxResults=15&key=${currentKey}`;
+        apiCall(url);
     }
 
-    async function requestYT(url) {
+    async function apiCall(url) {
         try {
             const r = await fetch(url);
             const d = await r.json();
-            if(d.error) throw d.error;
-            renderItems(d.items);
+            renderFeed(d.items);
         } catch(e) { console.error(e); }
     }
 
-    function renderItems(items) {
-        let html = '';
-        items.forEach(item => {
-            const id = item.id.videoId || item.id;
-            const s = item.snippet;
-            const videoUrl = `https://www.youtube.com/watch?v=${id}`;
-            const ssUrl = `https://ssyoutube.com/watch?v=${id}`; // Формат SaveFrom
-            const y2Url = `https://www.y2mate.com/youtube/${id}`; // Формат Y2Mate
-            
-            // Прокси для картинок
-            const thumb = `https://wsrv.nl/?url=${encodeURIComponent(s.thumbnails.high.url)}&output=jpg&q=80`;
+    function renderFeed(items) {
+        let h = '';
+        items.forEach(i => {
+            const id = i.id.videoId || i.id;
+            const s = i.snippet;
+            const vUrl = `https://www.youtube.com/watch?v=${id}`;
+            const secureThumb = `https://wsrv.nl/?url=${encodeURIComponent(s.thumbnails.high.url)}&output=jpg&q=80`;
 
-            html += `
-                <div class="video-card">
-                    <img src="${thumb}" onclick="window.open('${videoUrl}')">
-                    <div class="video-meta">
+            h += `
+                <div class="video-item">
+                    <img src="${secureThumb}" onclick="window.open('${vUrl}')">
+                    <div class="video-info">
                         <div class="video-title">${s.title}</div>
-                        <div class="download-options">
-                            <a href="${videoUrl}" target="_blank" class="btn btn-watch">СМОТРЕТЬ</a>
-                            <a href="${ssUrl}" target="_blank" class="btn btn-dl-1">СКАЧАТЬ (СПОСОБ 1)</a>
-                            <a href="${y2Url}" target="_blank" class="btn btn-dl-2">СКАЧАТЬ (СПОСОБ 2)</a>
+                        <div class="btn-stack">
+                            <button class="btn-action btn-red" onclick="window.open('${vUrl}')">СМОТРЕТЬ</button>
+                            <button class="btn-action btn-white" onclick="smartRedirect('${vUrl}', 'https://cobalt.tools')">МЕТОД 1 (COBALT)</button>
+                            <button class="btn-action btn-dark" onclick="smartRedirect('${vUrl}', 'https://snapsave.io/ru')">МЕТОД 2 (SNAPSAVE)</button>
+                            <button class="btn-action btn-dark" onclick="window.open('https://yout.com/video/${id}')">МЕТОД 3 (YOUT)</button>
                         </div>
                     </div>
                 </div>`;
         });
-        document.getElementById('main-feed').innerHTML = html;
+        document.getElementById('content-list').innerHTML = h;
         window.scrollTo(0,0);
     }
 
-    function showStatus(txt) {
-        const n = document.getElementById('notify');
-        n.innerText = txt;
-        n.style.display = 'block';
-        setTimeout(() => n.style.display = 'none', 2500);
+    function smartRedirect(url, service) {
+        // Копируем ссылку в буфер обмена
+        const el = document.createElement('textarea');
+        el.value = url;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+
+        // Показываем уведомление
+        const toast = document.getElementById('toast-msg');
+        toast.style.display = 'block';
+        setTimeout(() => toast.style.display = 'none', 2000);
+
+        // Переходим на сервис
+        setTimeout(() => {
+            window.open(service, '_blank');
+        }, 800);
     }
 </script>
 </body>
