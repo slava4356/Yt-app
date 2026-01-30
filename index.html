@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>YT CENTER | UNSTOPPABLE DL</title>
+    <title>YT CENTER | STABLE EDITION</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         :root { --red: #ff0000; --bg: #000; --card: #121212; --text: #fff; }
         body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; }
         
-        /* Авторизация */
-        .login-view { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; }
-        .logo { font-size: 40px; font-weight: 900; color: var(--red); margin-bottom: 20px; letter-spacing: -2px; }
+        /* Вход */
+        .login-screen { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; }
+        .logo { font-size: 40px; font-weight: 900; color: var(--red); margin-bottom: 20px; }
         .input-key { width: 100%; max-width: 320px; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 16px; border-radius: 12px; margin-bottom: 15px; text-align: center; font-size: 16px; outline: none; }
         
-        /* Главный экран */
+        /* Приложение */
         #app { display: none; }
-        .nav { position: sticky; top: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); padding: 10px; display: flex; gap: 8px; z-index: 100; border-bottom: 1px solid #222; }
-        .search-in { flex: 1; background: #222; border: none; border-radius: 10px; padding: 12px; color: #fff; font-size: 16px; outline: none; }
-        .btn-ok { background: var(--red); color: #fff; border: none; padding: 0 18px; border-radius: 10px; font-weight: bold; }
+        .nav { position: sticky; top: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); padding: 10px; display: flex; gap: 8px; z-index: 100; border-bottom: 1px solid #222; }
+        .search-bar { flex: 1; background: #222; border: none; border-radius: 10px; padding: 12px; color: #fff; font-size: 16px; outline: none; }
+        .btn-search { background: var(--red); color: #fff; border: none; padding: 0 18px; border-radius: 10px; font-weight: bold; }
         
         .tabs { display: flex; background: #000; border-bottom: 1px solid #222; }
         .tab { flex: 1; padding: 15px; text-align: center; font-size: 13px; font-weight: bold; color: #444; }
@@ -31,90 +31,81 @@
         .title { font-size: 15px; font-weight: bold; margin-bottom: 15px; line-height: 1.4; }
         
         /* Кнопки */
-        .dl-section { display: flex; flex-direction: column; gap: 8px; }
-        .btn-dl { background: #fff; color: #000; padding: 14px; border-radius: 10px; border: none; font-weight: bold; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-dl:disabled { background: #333; color: #666; cursor: not-allowed; }
+        .dl-group { display: flex; flex-direction: column; gap: 8px; }
+        .btn-dl { background: #fff; color: #000; padding: 14px; border-radius: 10px; border: none; font-weight: bold; font-size: 14px; cursor: pointer; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-alt { background: #333; color: #fff; font-size: 12px; padding: 10px; }
         
-        /* Кастомный статус вместо Alert */
-        #status-popup { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #fff; color: #000; padding: 14px 28px; border-radius: 50px; font-weight: bold; display: none; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-size: 14px; text-align: center; min-width: 200px; }
+        /* Сообщения */
+        #msg-box { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #fff; color: #000; padding: 12px 20px; border-radius: 10px; font-weight: bold; display: none; z-index: 1001; text-align: center; width: 80%; max-width: 300px; }
 
-        .loader { width: 18px; height: 18px; border: 2px solid currentColor; border-top: 2px solid transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .spin { width: 16px; height: 16px; border: 2px solid currentColor; border-top: 2px solid transparent; border-radius: 50%; animation: rot 0.8s linear infinite; }
+        @keyframes rot { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-<div id="status-popup"></div>
+<div id="msg-box"></div>
 
-<div id="login" class="login-view">
+<div id="login" class="login-screen">
     <div class="logo">YT CENTER</div>
-    <input type="password" id="key-field" class="input-key" placeholder="API Ключ YouTube">
-    <button onclick="save()" class="btn-dl" style="width: 100%; max-width: 320px; background: #ff0000; color: #fff;">ВОЙТИ</button>
-    <div style="margin: 25px 0; font-size: 12px; color: #333; letter-spacing: 1px;">GOOGLE AUTHORIZATION</div>
-    <div id="g_id_onload" data-client_id="275783825400-cp763gk82kdde9v0gf891pqt7hp2qfq9.apps.googleusercontent.com" data-callback="gInit"></div>
-    <div class="g_id_signin" data-type="standard"></div>
+    <input type="password" id="yt-key" class="input-key" placeholder="API Ключ YouTube">
+    <button onclick="login()" class="btn-dl" style="width: 100%; max-width: 320px; background: #ff0000; color: #fff;">ВОЙТИ</button>
+    <div id="g_id_onload" data-client_id="275783825400-cp763gk82kdde9v0gf891pqt7hp2qfq9.apps.googleusercontent.com" data-callback="gStart"></div>
+    <div class="g_id_signin" data-type="standard" style="margin-top:20px;"></div>
 </div>
 
 <div id="app">
     <div class="nav">
-        <input type="text" id="sq" class="search-in" placeholder="Поиск видео..." onkeypress="if(event.key==='Enter') doSearch()">
-        <button class="btn-ok" onclick="doSearch()">OK</button>
+        <input type="text" id="sq" class="search-bar" placeholder="Поиск видео..." onkeypress="if(event.key==='Enter') search()">
+        <button class="btn-search" onclick="search()">OK</button>
     </div>
     <div class="tabs">
-        <div id="t1" class="tab active" onclick="switchMode('t')">ТРЕНДЫ</div>
-        <div id="t2" class="tab" onclick="switchMode('s')">РЕКОМЕНДАЦИИ</div>
+        <div id="t1" class="tab active" onclick="tabMode('t')">ТРЕНДЫ</div>
+        <div id="t2" class="tab" onclick="tabMode('s')">ПОДПИСКИ</div>
     </div>
     <div id="list" class="feed"></div>
 </div>
 
 <script>
-    let key = localStorage.getItem('slava_ultra_v11') || '';
+    let myKey = localStorage.getItem('slava_fix_v12') || '';
     let mode = 't';
 
-    // Список рабочих зеркал Cobalt для обхода блокировок
-    const endpoints = [
-        'https://api.cobalt.tools/api/json',
-        'https://cobalt.shorthand.social/api/json',
-        'https://api.cobalt.club/api/json',
-        'https://cobalt-api.zeon.dev/api/json'
-    ];
+    if(myKey) init();
 
-    if(key) start();
+    function gStart() { if(!myKey) document.getElementById('yt-key').focus(); else init(); }
 
-    function gInit() { if(!key) document.getElementById('key-field').focus(); else start(); }
-
-    function save() {
-        const v = document.getElementById('key-field').value.trim();
-        if(v) { key = v; localStorage.setItem('slava_ultra_v11', v); start(); }
-        else showMsg("Введите API ключ!");
+    function login() {
+        const v = document.getElementById('yt-key').value.trim();
+        if(v) { myKey = v; localStorage.setItem('slava_fix_v12', v); init(); }
+        else alert("Введите ключ!");
     }
 
-    function start() {
+    function init() {
         document.getElementById('login').style.display = 'none';
         document.getElementById('app').style.display = 'block';
-        fetchContent();
+        load();
     }
 
-    function switchMode(m) {
+    function tabMode(m) {
         mode = m;
         document.getElementById('t1').className = m === 't' ? 'tab active' : 'tab';
         document.getElementById('t2').className = m === 's' ? 'tab active' : 'tab';
-        fetchContent();
+        load();
     }
 
-    async function doSearch() {
+    async function search() {
         const q = document.getElementById('sq').value;
-        if(q) fetchUrl(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&type=video&maxResults=15&key=${key}`);
+        if(q) fetchVideos(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&type=video&maxResults=15&key=${myKey}`);
     }
 
-    async function fetchContent() {
+    async function load() {
         let url = mode === 't' 
-            ? `https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&regionCode=RU&maxResults=15&key=${key}`
-            : `https://www.googleapis.com/youtube/v3/search?part=snippet&q=интересное&type=video&maxResults=15&key=${key}`;
-        fetchUrl(url);
+            ? `https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&regionCode=RU&maxResults=15&key=${myKey}`
+            : `https://www.googleapis.com/youtube/v3/search?part=snippet&q=рекомендации&type=video&maxResults=15&key=${myKey}`;
+        fetchVideos(url);
     }
 
-    async function fetchUrl(url) {
+    async function fetchVideos(url) {
         try {
             const r = await fetch(url);
             const d = await r.json();
@@ -135,9 +126,12 @@
                     <img src="${thumb}" onclick="window.open('${link}')">
                     <div class="info">
                         <div class="title">${s.title}</div>
-                        <div class="dl-section">
-                            <button class="btn-dl" id="b-${id}" onclick="multiDownload('${link}', '${id}')">
-                                <span id="t-${id}">СКАЧАТЬ MP4</span>
+                        <div class="dl-group">
+                            <button class="btn-dl" id="b-${id}" onclick="smartDl('${link}', '${id}')">
+                                <span id="txt-${id}">СКАЧАТЬ MP4</span>
+                            </button>
+                            <button class="btn-dl btn-alt" onclick="window.open('https://ssyoutube.com/en1/youtube-video-downloader?url=${link}')">
+                                ЗАПАСНОЙ МЕТОД (SaveFrom)
                             </button>
                         </div>
                     </div>
@@ -147,74 +141,50 @@
         window.scrollTo(0,0);
     }
 
-    // МНОГОУРОВНЕВЫЙ ЗАГРУЗЧИК (ПЕРЕБОР ЗЕРКАЛ)
-    async function multiDownload(videoUrl, id) {
+    // УМНЫЙ ЗАГРУЗЧИК (НЕ ЗАВИСАЕТ)
+    async function smartDl(url, id) {
         const btn = document.getElementById('b-' + id);
-        const text = document.getElementById('t-' + id);
+        const txt = document.getElementById('txt-' + id);
         
         btn.disabled = true;
-        text.innerHTML = `<div class="loader"></div> ПОИСК СЕРВЕРА...`;
-        showMsg("Ищем свободный сервер...");
+        txt.innerHTML = `<div class="spin"></div> ПРОВЕРКА...`;
+        
+        // Таймер отмены, если сервер молчит больше 5 секунд
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 6000);
 
-        let downloadStarted = false;
+        try {
+            const response = await fetch('https://api.cobalt.tools/api/json', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                signal: controller.signal,
+                body: JSON.stringify({ url: url, videoQuality: '720' })
+            });
 
-        // Цикл по всем доступным зеркалам
-        for (let i = 0; i < endpoints.length; i++) {
-            const currentApi = endpoints[i];
-            console.log(`Пробуем сервер: ${currentApi}`);
-            
-            try {
-                const response = await fetch(currentApi, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                    body: JSON.stringify({ 
-                        url: videoUrl, 
-                        videoQuality: '720',
-                        filenameStyle: 'basic'
-                    })
-                });
-
-                if (!response.ok) throw new Error("Server error");
-                
-                const data = await response.json();
-
-                if (data.url) {
-                    showMsg("Сервер найден! Начинаю скачивание...");
-                    const a = document.createElement('a');
-                    a.href = data.url;
-                    a.click();
-                    downloadStarted = true;
-                    break; // Успех, выходим из цикла
-                }
-            } catch (err) {
-                console.warn(`Сервер ${i+1} не ответил, пробую следующий...`);
-                text.innerHTML = `<div class="loader"></div> СЕРВЕР ${i+2}...`;
+            const data = await response.json();
+            if (data.url) {
+                window.location.href = data.url;
+                txt.innerText = "ГОТОВО";
+            } else {
+                throw "no link";
             }
-        }
-
-        if (downloadStarted) {
-            text.innerText = "ГОТОВО";
+        } catch (e) {
+            msg("Прямой сервер не ответил. Используйте 'Запасной метод'.");
+            txt.innerText = "ОШИБКА";
+        } finally {
+            clearTimeout(timeoutId);
             setTimeout(() => {
                 btn.disabled = false;
-                text.innerText = "СКАЧАТЬ MP4";
+                txt.innerText = "СКАЧАТЬ MP4";
             }, 3000);
-        } else {
-            showMsg("ОШИБКА: Все серверы заблокированы. Включи ВПН.");
-            btn.disabled = false;
-            text.innerText = "СКАЧАТЬ MP4";
         }
-        
-        setTimeout(hideMsg, 3000);
     }
 
-    function showMsg(txt) {
-        const p = document.getElementById('status-popup');
-        p.innerText = txt;
-        p.style.display = 'block';
-    }
-
-    function hideMsg() {
-        document.getElementById('status-popup').style.display = 'none';
+    function msg(t) {
+        const b = document.getElementById('msg-box');
+        b.innerText = t;
+        b.style.display = 'block';
+        setTimeout(() => b.style.display = 'none', 4000);
     }
 </script>
 </body>
